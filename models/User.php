@@ -106,6 +106,7 @@ class User extends \yii\mongodb\ActiveRecord implements IdentityInterface
             ['username', 'match', 'pattern' => static::$usernameRegexp],
             ['email', 'required'],
             ['email', 'email'],
+            [['email', 'username'], 'unique'],
             ['profile_data', 'validateProfile', 'skipOnEmpty' => true],
         ];
     }

@@ -29,6 +29,9 @@ class Module extends \yii\base\Module
     /** @var int Cost parameter used by the Blowfish hash algorithm. */
     public $cost = 10;
 
+    /** @var int The time you want the user will be remembered without asking for credentials. */
+    public $rememberFor = 1209600; // two weeks
+
     /**
      * @var string The prefix for user module URL.
      *

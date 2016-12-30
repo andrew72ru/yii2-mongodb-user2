@@ -45,7 +45,7 @@ class Bootstrap implements BootstrapInterface
             }
 
             if(Yii::$app instanceof \yii\console\Application)
-                $module->controllerNamespace = "andrew72ru\user\commands";
+                $module->controllerNamespace = 'andrew72ru\user\commands';
             else
             {
                 Yii::$container->set('\yii\web\User', [
