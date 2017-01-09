@@ -11,12 +11,64 @@ namespace andrew72ru\user\controllers;
 
 
 use andrew72ru\user\models\LoginForm;
+use yii\filters\AccessControl;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\Response;
 use yii\widgets\ActiveForm;
 
+/**
+ * Контроллер для авторизации / аутентификации пользователей
+ *
+ * Class SecurityController
+ * @package andrew72ru\user\controllers
+ */
 class SecurityController extends Controller
 {
+    /**
+     * @inheritdoc
+     * @return array
+     */
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['login', 'auth', 'blocked'],
+                        'roles' => ['?']
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['login', 'auth', 'logout'],
+                        'roles' => ['@']
+                    ]
+                ]
+            ],
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'logout' => ['post']
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * @return \andrew72ru\user\Module
+     */
+    private function getModule()
+    {
+        return \Yii::$app->getModule('user');
+    }
+
+    /**
+     * Login
+     *
+     * @return array|string|Response
+     */
     public function actionLogin()
     {
         if(!\Yii::$app->user->isGuest)
@@ -39,10 +91,13 @@ class SecurityController extends Controller
     }
 
     /**
-     * @return \andrew72ru\user\Module
+     * Logout
+     *
+     * @return Response
      */
-    private function getModule()
+    public function actionLogout()
     {
-        return \Yii::$app->getModule('user');
+        \Yii::$app->user->logout();
+        return $this->goHome();
     }
 }

@@ -15,6 +15,7 @@ use MongoDB\BSON\UTCDateTime;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\mongodb\validators\MongoIdValidator;
+use yii\web\BadRequestHttpException;
 use yii\web\IdentityInterface;
 use Yii;
 
@@ -35,6 +36,8 @@ use Yii;
  * @property string         password_hash
  *
  * @property string         fullName
+ * @property string|null    avatar
+ * @property UserAvatar     avatarModel
  */
 class User extends \yii\mongodb\ActiveRecord implements IdentityInterface
 {
@@ -119,6 +122,7 @@ class User extends \yii\mongodb\ActiveRecord implements IdentityInterface
     public function validateProfile($attribute)
     {
         $profile = new Profile();
+        $profileData = [];
         foreach($this->$attribute as $profile_field_name => $value)
         {
             if ($profile->hasProperty($profile_field_name))
@@ -127,10 +131,10 @@ class User extends \yii\mongodb\ActiveRecord implements IdentityInterface
                 if(!$profile->validate($profile_field_name))
                     $this->addError($attribute, $profile->getFirstError($profile_field_name));
                 else
-                    $this->profile_data[$profile_field_name] = $value;
+                    $profileData[$profile_field_name] = $value;
             }
         }
-
+        $this->profile_data = $profileData;
 
     }
 
@@ -147,6 +151,27 @@ class User extends \yii\mongodb\ActiveRecord implements IdentityInterface
         $this->password = empty($this->password) ? Password::generate(10) : $this->password;
 
         return $this->save();
+    }
+
+    /**
+     * @return UserAvatar|null
+     * @throws BadRequestHttpException
+     */
+    public function getAvatarModel()
+    {
+        $model = UserAvatar::findOne([
+            'user_id' => $this->_id,
+            'thumbnail_size' => 'default',
+        ]);
+        if($model === null)
+        {
+            $model = new UserAvatar(['user_id' => $this->_id]);
+            $model->createDefaultAvatar();
+            if(!$model->save())
+                throw new BadRequestHttpException('Unable to create avatar');
+        }
+
+        return $model;
     }
 
     /**
