@@ -13,6 +13,7 @@ use MongoDB\BSON\ObjectID;
 use MongoDB\BSON\UTCDateTime;
 use yii\helpers\ArrayHelper;
 use yii\mongodb\validators\MongoIdValidator;
+use yii\web\UploadedFile;
 
 /**
  * Аватары пользователей
@@ -32,6 +33,9 @@ use yii\mongodb\validators\MongoIdValidator;
  */
 class UserAvatar extends \yii\mongodb\file\ActiveRecord
 {
+    /** @var \yii\web\UploadedFile|null $uploadedFile */
+    public $uploadedFile;
+
     /** @var \Intervention\Image\ImageManager */
     private $manager;
 
@@ -69,6 +73,7 @@ class UserAvatar extends \yii\mongodb\file\ActiveRecord
         return [
             ['user_id', MongoIdValidator::className(), 'forceFormat' => 'object'],
             ['thumbnail_size', 'string'],
+            ['uploadedFile', 'image', 'mimeTypes' => 'image/*', 'checkExtensionByMimeType' => true, 'extensions' => ['png', 'jpg', 'jpeg']]
         ];
     }
 
@@ -125,5 +130,35 @@ class UserAvatar extends \yii\mongodb\file\ActiveRecord
 
         $model->newFileContent = $image->encode('png');
         return $model;
+    }
+
+    /**
+     * @param int $size
+     * @return bool
+     */
+    public function upload($size = 300)
+    {
+        $this->uploadedFile = UploadedFile::getInstance($this, 'uploadedFile');
+        if($this->uploadedFile instanceof UploadedFile)
+        {
+            if(!$this->user_id)
+                $this->user_id = \Yii::$app->user->identity->_id;
+
+            $image = $this->manager->make($this->uploadedFile->tempName);
+            if(!($image instanceof \Intervention\Image\Image))
+            {
+                \Yii::error("Unable to create Image from {$this->uploadedFile->tempName}", 'User Avatar');
+                return false;
+            }
+            $image->fit($size, $size);
+            $this->filename = 'avatar.png';
+            $this->thumbnail_size = 'default';
+            $this->newFileContent = $image->encode('png');
+            self::deleteAll(['user_id' => $this->user_id]);
+
+            return $this->save();
+        }
+
+        return false;
     }
 }
