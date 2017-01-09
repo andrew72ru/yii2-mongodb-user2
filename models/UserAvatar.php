@@ -75,9 +75,10 @@ class UserAvatar extends \yii\mongodb\file\ActiveRecord
     /**
      * @param int    $size
      * @param string $background
+     * @param bool|string $letter
      * @return $this
      */
-    public function createDefaultAvatar($size = 300, $background = '#8a8a8a')
+    public function createDefaultAvatar($size = 300, $background = '#8a8a8a', $letter = false)
     {
         $user = User::findOne($this->user_id);
         if($user === null)
@@ -90,7 +91,9 @@ class UserAvatar extends \yii\mongodb\file\ActiveRecord
         $fontFile = \Yii::getAlias('@andrew72ru/user/helpers/Lato-Thin.ttf');
         if(is_file($fontFile))
         {
-            $letter = mb_strtoupper(mb_substr($user->getFullName(), 0, 1));
+            if(!$letter)
+                $letter = mb_strtoupper(mb_substr($user->getFullName(), 0, 1));
+
             $image->text($letter, ($size / 2), ($size / 2), function(\Intervention\Image\AbstractFont $font)
             {
                 $font->file(\Yii::getAlias('@andrew72ru/user/helpers/Lato-Thin.ttf'));

@@ -32,10 +32,11 @@ class AvatarController extends Controller
     /**
      * Сброс пользовательского аватара в дефолтный. С указанием id сбрасывается только аватар указанного пользователя
      *
-     * @param null|string $userId
+     * @param null|string   $userId     идентификатор пользователя
+     * @param null|string   $letter     буква для аватара
      * @return integer
      */
-    public function actionRefresh($userId = null)
+    public function actionRefresh($userId = null, $letter = null)
     {
         $models = [];
         if($userId !== null)
@@ -53,21 +54,22 @@ class AvatarController extends Controller
             $models = User::find()->all();
 
         foreach($models as $user)
-            $this->resetAvatar($user);
+            $this->resetAvatar($user, ($letter === null ? false : $letter));
 
         return Controller::EXIT_CODE_NORMAL;
     }
 
     /**
      * @param User $user
+     * @param bool|string $letter
      * @return int
      */
-    private function resetAvatar(User $user)
+    private function resetAvatar(User $user, $letter = false)
     {
         UserAvatar::deleteAll(['user_id' => $user->_id]);
         $model = new UserAvatar();
         $model->user_id = $user->_id;
-        $model->createDefaultAvatar();
+        $model->createDefaultAvatar(300, '#8a8a8a', $letter);
         if(!$model->save())
         {
             $this->stderr("Unable to create avatar for user {$user->getFullName()}\n:", Console::FG_RED);
