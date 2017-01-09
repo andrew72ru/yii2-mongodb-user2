@@ -60,6 +60,54 @@ class AvatarController extends Controller
     }
 
     /**
+     * Установка картинки для пользователя
+     *
+     * @param string    $userId     идентификатор пользователя
+     * @param string    $file       путь к файлу картинки
+     * @return int
+     */
+    public function actionSetAvatar($userId, $file)
+    {
+        if(!is_file($file))
+        {
+            $this->stderr(" File {$file} does not exists, exiting ", Console::BG_RED, Console::FG_BLACK);
+            $this->stdout("\n");
+            return Controller::EXIT_CODE_ERROR;
+        }
+        $user = User::findOne($userId);
+        if($user === null)
+        {
+            $this->stderr("User with id {$userId} not found, exiting", Console::BG_RED, Console::FG_BLACK);
+            $this->stdout("\n");
+            return Controller::EXIT_CODE_ERROR;
+        }
+        UserAvatar::deleteAll(['user_id' => $user->_id]);
+
+        $model = new UserAvatar();
+        $model->user_id = $user->_id;
+        $model->thumbnail_size = 'default';
+        $manager = new \Intervention\Image\ImageManager(['driver' => 'imagick']);
+        $image = $manager->make($file);
+        if(!($image instanceof \Intervention\Image\Image))
+        {
+            $this->stderr("Unable to create Image from {$file}, exiting", Console::BG_RED, Console::FG_BLACK);
+            $this->stdout("\n");
+            return Controller::EXIT_CODE_ERROR;
+        }
+        $model->newFileContent = $image->encode('png');
+        if(!$model->save())
+        {
+            $this->stderr("Unable to save User Avatar", Console::BG_RED, Console::FG_BLACK);
+            $this->stdout("\n");
+            VarDumper::dump($model->errors);
+            return Controller::EXIT_CODE_ERROR;
+        }
+        $this->stdout("Avatar for user {$userId} from file {$file} successfully set\n", Console::FG_GREEN);
+
+        return Controller::EXIT_CODE_NORMAL;
+    }
+
+    /**
      * @param User $user
      * @param bool|string $letter
      * @return int
