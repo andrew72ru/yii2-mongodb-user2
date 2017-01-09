@@ -86,6 +86,21 @@ class UserAvatar extends \yii\mongodb\file\ActiveRecord
         $image = $this->manager->canvas($size, $size, $background);
         $this->filename = 'avatar.png';
         $this->thumbnail_size = 'default';
+
+        $fontFile = \Yii::getAlias('@andrew72ru/user/helpers/Lato-Thin.ttf');
+        if(is_file($fontFile))
+        {
+            $letter = mb_strtoupper(mb_substr($user->getFullName(), 0, 1));
+            $image->text($letter, ($size / 2), ($size / 2), function(\Intervention\Image\AbstractFont $font)
+            {
+                $font->file(\Yii::getAlias('@andrew72ru/user/helpers/Lato-Thin.ttf'));
+                $font->size(250);
+                $font->align('center');
+                $font->valign('middle');
+                $font->color('#fff');
+            });
+        }
+
         $this->newFileContent = $image->encode('png');
         return $this;
     }
