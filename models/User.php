@@ -110,7 +110,7 @@ class User extends \yii\mongodb\ActiveRecord implements IdentityInterface
             ['email', 'required'],
             ['email', 'email'],
             [['email', 'username'], 'unique'],
-            ['profile_data', 'validateProfile', 'skipOnEmpty' => true],
+//            ['profile_data', 'validateProfile', 'skipOnEmpty' => true],
         ];
     }
 
@@ -125,6 +125,9 @@ class User extends \yii\mongodb\ActiveRecord implements IdentityInterface
         $profileData = [];
         foreach($this->$attribute as $profile_field_name => $value)
         {
+            if(empty($value))
+                continue;
+
             if ($profile->hasProperty($profile_field_name))
             {
                 $profile->$profile_field_name = $value;
@@ -135,7 +138,6 @@ class User extends \yii\mongodb\ActiveRecord implements IdentityInterface
             }
         }
         $this->profile_data = $profileData;
-
     }
 
     /**

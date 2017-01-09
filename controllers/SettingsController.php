@@ -9,8 +9,10 @@
 
 namespace andrew72ru\user\controllers;
 
-use andrew72ru\user\models\User;
 use Yii;
+use andrew72ru\user\models\SettingsForm;
+use andrew72ru\user\models\User;
+use andrew72ru\user\traits\ModuleTrait;
 use yii\filters\VerbFilter;
 use yii\helpers\Html;
 use yii\web\Controller;
@@ -23,9 +25,13 @@ use yii\widgets\ActiveForm;
  *
  * Class SettingsController
  * @package andrew72ru\user\controllers
+ *
+ * @property \andrew72ru\user\Module $module
  */
 class SettingsController extends Controller
 {
+    use ModuleTrait;
+
     /** @inheritdoc */
     public $defaultAction = 'profile';
 
@@ -73,12 +79,46 @@ class SettingsController extends Controller
             if(!$user->updateAttributes(['profile_data' => $model->attributes]))
                 Yii::$app->session->addFlash('error', Html::errorSummary([$user, $model], ['header' => null]));
             else
+            {
+                Yii::$app->session->addFlash('success', Yii::t('user', 'Profile Data updated Successfully'));
                 return $this->refresh();
+            }
         }
 
         return $this->render('profile', [
             'model' => $model
         ]);
+    }
+
+    /**
+     * @return array|string|Response
+     * @throws NotFoundHttpException
+     */
+    public function actionAccount()
+    {
+        $model = new SettingsForm();
+        $user = $this->findUser();
+        $model->username = $user->username;
+        $model->email = $user->email;
+
+        if(Yii::$app->request->isAjax && $model->load(Yii::$app->request->post()))
+        {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($model);
+        }
+
+        if($model->load(Yii::$app->request->post()))
+        {
+            if(!$model->save())
+                Yii::$app->session->addFlash('error', Html::errorSummary($model->user), ['header' => null]);
+            else
+            {
+                Yii::$app->session->addFlash('success', Yii::t('user', 'Account data updated successfully'));
+                return $this->refresh();
+            }
+        }
+
+        return $this->render('account', ['model' => $model]);
     }
 
     /**

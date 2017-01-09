@@ -10,7 +10,7 @@
  */
 
 /** @var \andrew72ru\user\models\User $user */
-$user = Yii::$app->user->getIdentity();
+$user = Yii::$app->user->identity;
 ?>
 
 <div class="panel panel-default">
