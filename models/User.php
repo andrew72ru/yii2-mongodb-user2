@@ -10,6 +10,8 @@
 namespace andrew72ru\user\models;
 
 use andrew72ru\user\helpers\Password;
+use andrew72ru\user\Module;
+use andrew72ru\user\traits\ModuleTrait;
 use MongoDB\BSON\ObjectID;
 use MongoDB\BSON\UTCDateTime;
 use yii\base\NotSupportedException;
@@ -38,9 +40,12 @@ use Yii;
  * @property string         fullName
  * @property string|null    avatar
  * @property UserAvatar     avatarModel
+ * @property Module         module
  */
 class User extends \yii\mongodb\ActiveRecord implements IdentityInterface
 {
+    use ModuleTrait;
+
     /** @var string Plain password. Used for model validation. */
     public $password;
 
@@ -242,9 +247,12 @@ class User extends \yii\mongodb\ActiveRecord implements IdentityInterface
         return $str;
     }
 
+    /**
+     * @return bool
+     */
     public function getIsAdmin()
     {
-        return false;
+        return (Yii::$app->getAuthManager() && $this->module->adminPermission ? Yii::$app->user->can($this->module->adminPermission) : false) || in_array($this->username, $this->module->admins);
     }
 
     /**

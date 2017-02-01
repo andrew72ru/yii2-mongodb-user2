@@ -13,7 +13,7 @@ namespace andrew72ru\user\traits;
 trait ModuleTrait
 {
     /**
-     * @return \andrew72ru\user\Module
+     * @return \andrew72ru\user\Module|\yii\base\Module
      */
     public function getModule()
     {
