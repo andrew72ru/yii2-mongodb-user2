@@ -13,6 +13,8 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
+$this->title = Yii::t('user', 'Sign In');
+
 ?>
 
 <div class="login-box">
