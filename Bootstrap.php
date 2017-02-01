@@ -48,7 +48,7 @@ class Bootstrap implements BootstrapInterface
                 $module->controllerNamespace = 'andrew72ru\user\commands';
             else
             {
-                Yii::$container->set('\yii\web\User', [
+                Yii::$container->set('yii\web\User', [
                     'enableAutoLogin' => true,
                     'loginUrl'        => ['/user/security/login'],
                     'identityClass'   => $module->modelMap['User'],
