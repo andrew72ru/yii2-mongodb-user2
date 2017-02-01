@@ -57,7 +57,7 @@ class SecurityController extends Controller
     }
 
     /**
-     * @return \andrew72ru\user\Module
+     * @return \andrew72ru\user\Module|\yii\base\Module
      */
     private function getModule()
     {
