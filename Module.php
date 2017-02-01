@@ -39,6 +39,11 @@ class Module extends \yii\base\Module
      */
     public $urlPrefix = 'user';
 
+    /** @var bool Enable the 'impersonate as another user' function */
+    public $enableImpersonateUser = true;
+
+    public $controllerNamespace = 'andrew72ru\user\controllers';
+
     /** @var array The rules to be used in URL management. */
     public $urlRules = [
         '<id:\d+>'                               => 'profile/show',

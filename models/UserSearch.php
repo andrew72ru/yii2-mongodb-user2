@@ -7,7 +7,7 @@
  * Time: 15:23
  */
 
-namespace models;
+namespace andrew72ru\user\models;
 
 
 use andrew72ru\user\models\User;

@@ -41,6 +41,8 @@ use Yii;
  * @property string|null    avatar
  * @property UserAvatar     avatarModel
  * @property Module         module
+ * @property bool           isBlocked
+ * @property bool           isAdmin
  */
 class User extends \yii\mongodb\ActiveRecord implements IdentityInterface
 {
@@ -63,6 +65,7 @@ class User extends \yii\mongodb\ActiveRecord implements IdentityInterface
             'created_at',
             'updated_at',
             'confirmed_at',
+            'blocked_at',
             'email',
             'auth_key',
             'password_hash',
@@ -245,6 +248,11 @@ class User extends \yii\mongodb\ActiveRecord implements IdentityInterface
             $str .= ' ' . $this->getProfile()->last_name;
 
         return $str;
+    }
+
+    public function getIsBlocked()
+    {
+        return $this->blocked_at != null;
     }
 
     /**
