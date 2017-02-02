@@ -13,7 +13,8 @@
   "require": {
     "yiisoft/yii2": "^2.0",
     "intervention/image": "^2.3",
-    "yiisoft/yii2-mongodb": "^2.1"
+    "yiisoft/yii2-mongodb": "^2.1",
+    "bower-asset/flow.js": "^2.11"
   },
   "autoload": {
     "psr-4": {
