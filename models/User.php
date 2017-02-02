@@ -33,6 +33,7 @@ use Yii;
  * @property UTCDateTime    created_at
  * @property UTCDateTime    updated_at
  * @property UTCDateTime    confirmed_at
+ * @property UTCDateTime    blocked_at
  * @property string         email
  * @property string         auth_key
  * @property string         password_hash

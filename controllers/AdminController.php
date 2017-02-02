@@ -12,6 +12,7 @@ use andrew72ru\user\models\User;
 use andrew72ru\user\models\UserSearch;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
+use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -129,6 +130,57 @@ class AdminController extends Controller
 
         return $this->render('_account', [
             'model' => $model
+        ]);
+    }
+
+    /**
+     * @param $id
+     * @return array|string|Response
+     */
+    public function actionUpdateProfile($id)
+    {
+        Url::remember('', 'actions-redirect');
+        $user = $this->findModel($id);
+        $model = $user->getProfile();
+
+        if(Yii::$app->request->isAjax && $model->load(Yii::$app->request->post()))
+        {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($model);
+        }
+
+        if($model->load(Yii::$app->request->post()) && $model->validate())
+        {
+            if($user->avatarModel->load(Yii::$app->request->post()))
+                $user->avatarModel->upload();
+
+            if($user->profile_data == $model->attributes)
+                return $this->refresh();
+
+            if(!$user->updateAttributes(['profile_data' => $model->attributes]))
+                Yii::$app->session->addFlash('error', Html::errorSummary([$user, $model], ['header' => null]));
+            else
+            {
+                Yii::$app->session->addFlash('success', Yii::t('user', 'Profile details have been updated'));
+                return $this->refresh();
+            }
+        }
+
+        return $this->render('_profile', [
+            'model' => $model,
+            'user' => $user
+        ]);
+    }
+
+    /**
+     * @param $id
+     * @return string
+     */
+    public function actionInfo($id)
+    {
+        Url::remember('', 'actions-redirect');
+        return $this->render('_info', [
+            'model' => $this->findModel($id)
         ]);
     }
 
