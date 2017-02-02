@@ -108,8 +108,27 @@ class User extends \yii\mongodb\ActiveRecord implements IdentityInterface
     }
 
     /**
+     * @param bool $insert
+     * @return bool
+     */
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert))
+        {
+            if($insert)
+                $this->setAttribute('auth_key', Yii::$app->security->generateRandomString());
+
+            if(!empty($this->password))
+                $this->setAttribute('password_hash', Password::hash($this->password));
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * @inheritdoc
-     * @todo Unique Validator!
      */
     public function rules()
     {
@@ -119,9 +138,24 @@ class User extends \yii\mongodb\ActiveRecord implements IdentityInterface
             ['username', 'match', 'pattern' => static::$usernameRegexp],
             ['email', 'required'],
             ['email', 'email'],
-//            [['email', 'username'], 'unique', 'targetAttribute' => ['email', 'username']],
+            [['email', 'username'], 'validateUnique'],
 //            ['profile_data', 'validateProfile', 'skipOnEmpty' => true],
         ];
+    }
+
+    /**
+     * @param $attribute
+     */
+    public function validateUnique($attribute)
+    {
+        if(self::find()->where([
+            '_id' => ['$ne' => $this->_id],
+            $attribute => $this->$attribute,
+        ])->exists())
+            $this->addError($attribute, Yii::t('user', 'User with {attribute_name} "{attribute_value}" already exist', [
+                'attribute_name' => $this->getAttributeLabel($attribute),
+                'attribute_value' => $this->$attribute
+            ]));
     }
 
     /**
@@ -318,26 +352,6 @@ class User extends \yii\mongodb\ActiveRecord implements IdentityInterface
         return $this->resetPassword();
     }
 
-
-    /**
-     * @param bool $insert
-     * @return bool
-     */
-    public function beforeSave($insert)
-    {
-        if (parent::beforeSave($insert))
-        {
-            if($insert)
-                $this->setAttribute('auth_key', Yii::$app->security->generateRandomString());
-
-            if(!empty($this->password))
-                $this->setAttribute('password_hash', Password::hash($this->password));
-
-            return true;
-        }
-
-        return false;
-    }
 
     /**
      * Finds an identity by the given ID.
