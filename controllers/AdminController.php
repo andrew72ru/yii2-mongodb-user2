@@ -15,6 +15,7 @@ use yii\filters\VerbFilter;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\widgets\ActiveForm;
@@ -30,6 +31,7 @@ use Yii;
  */
 class AdminController extends Controller
 {
+    const ORIGINAL_USER_SESSION_KEY = 'original_user';
     /**
      * @return array
      */
@@ -182,6 +184,34 @@ class AdminController extends Controller
         return $this->render('_info', [
             'model' => $this->findModel($id)
         ]);
+    }
+
+    /**
+     * @param null $id
+     * @return Response
+     * @throws ForbiddenHttpException
+     */
+    public function actionSwitch($id = null)
+    {
+        if(!$this->module->enableImpersonateUser)
+            throw new ForbiddenHttpException(Yii::t('user', 'Impersonate user is disabled in the application configuration'));
+
+        if(!$id && Yii::$app->session->has(self::ORIGINAL_USER_SESSION_KEY))
+        {
+            $user = $this->findModel(Yii::$app->session->get(self::ORIGINAL_USER_SESSION_KEY));
+            Yii::$app->session->remove(self::ORIGINAL_USER_SESSION_KEY);
+        } else
+        {
+            if(!Yii::$app->user->identity->isAdmin)
+                throw new ForbiddenHttpException();
+
+            $user = $this->findModel($id);
+            Yii::$app->session->set(self::ORIGINAL_USER_SESSION_KEY, Yii::$app->user->id);
+        }
+
+        Yii::$app->user->switchIdentity($user, 3600);
+
+        return $this->goHome();
     }
 
     /**
