@@ -252,9 +252,32 @@ class User extends \yii\mongodb\ActiveRecord implements IdentityInterface
         return $str;
     }
 
+    /**
+     * @return bool
+     */
     public function getIsBlocked()
     {
         return $this->blocked_at != null;
+    }
+
+    /**
+     * @return bool
+     */
+    public function block()
+    {
+        return (bool) $this->updateAttributes([
+            'blocked_at' => new UTCDateTime(strtotime('now') * 1000)
+        ]);
+    }
+
+    /**
+     * @return bool
+     */
+    public function unblock()
+    {
+        return (bool) $this->updateAttributes([
+            'blocked_at' => null
+        ]);
     }
 
     /**
@@ -264,6 +287,37 @@ class User extends \yii\mongodb\ActiveRecord implements IdentityInterface
     {
         return (Yii::$app->getAuthManager() && $this->module->adminPermission ? Yii::$app->user->can($this->module->adminPermission) : false) || in_array($this->username, $this->module->admins);
     }
+
+    /**
+     * @return bool
+     */
+    public function confirm()
+    {
+        return (bool) $this->updateAttributes([
+            'confirmed_at' => new UTCDateTime(strtotime('now') * 1000)
+        ]);
+    }
+
+    /**
+     * @param null|string $password
+     * @return bool
+     */
+    public function resetPassword($password = null)
+    {
+        return (bool) $this->updateAttributes([
+            'password_hash' => ($password === null ? Password::hash(Password::generate(8)) : Password::hash($password))
+        ]);
+    }
+
+    /**
+     * @return bool
+     * @todo mailer action
+     */
+    public function resendPassword()
+    {
+        return $this->resetPassword();
+    }
+
 
     /**
      * @param bool $insert

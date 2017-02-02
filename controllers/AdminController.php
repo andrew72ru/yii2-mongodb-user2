@@ -234,6 +234,86 @@ class AdminController extends Controller
 
     /**
      * @param $id
+     * @return Response
+     */
+    public function actionConfirm($id)
+    {
+        if($this->findModel($id)->confirm())
+            Yii::$app->session->addFlash('success', Yii::t('user', 'User has been confirmed'));
+        else
+            Yii::$app->session->addFlash('error', Yii::t('user', 'User NOT has been confirmed'));
+
+        return $this->redirect(Url::previous('actions-redirect'));
+    }
+
+    /**
+     * @param $id
+     * @return Response
+     */
+    public function actionDelete($id)
+    {
+        if($id == Yii::$app->user->id)
+        {
+            Yii::$app->session->addFlash('danger', Yii::t('user', 'You can not remove your own account'));
+
+            return $this->redirect(['index']);
+        }
+
+        if($this->findModel($id)->delete())
+            Yii::$app->session->addFlash('success', Yii::t('user', 'User has been deleted'));
+        else
+            Yii::$app->session->addFlash('error', Yii::t('user', 'User NOT has been deleted'));
+
+        return $this->redirect(['index']);
+    }
+
+    /**
+     * @param $id
+     * @return Response
+     */
+    public function actionBlock($id)
+    {
+        if($id == Yii::$app->user->id)
+        {
+            Yii::$app->session->addFlash('danger', Yii::t('user', 'You can not remove your own account'));
+            return $this->redirect(Url::previous('actions-redirect'));
+        }
+
+        $model = $this->findModel($id);
+        if($model->isBlocked)
+        {
+            $model->unblock();
+            Yii::$app->session->addFlash('success', Yii::t('user', 'User has been unblocked'));
+        }
+        else
+        {
+            $model->block();
+            Yii::$app->session->addFlash('success', Yii::t('user', 'User has been blocked'));
+        }
+        return $this->redirect(Url::previous('actions-redirect'));
+    }
+
+    /**
+     * @param $id
+     * @return Response
+     * @throws ForbiddenHttpException
+     */
+    public function actionResendPassword($id)
+    {
+        $model = $this->findModel($id);
+        if($model->isAdmin)
+            throw new ForbiddenHttpException(Yii::t('user', 'Password generation is not possible for admin users'));
+
+        if($model->resendPassword())
+            Yii::$app->session->addFlash('success', Yii::t('user', 'New Password has been generated and sent (actually no send) to user'));
+        else
+            Yii::$app->session->addFlash('danger', Yii::t('user', 'Error while trying to generate new password'));
+
+        return $this->redirect(Url::previous('actions-redirect'));
+    }
+
+    /**
+     * @param $id
      * @return User
      * @throws NotFoundHttpException
      */
