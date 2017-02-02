@@ -86,7 +86,8 @@ class SettingsController extends Controller
         }
 
         return $this->render('profile', [
-            'model' => $model
+            'model' => $model,
+            'user' => $user,
         ]);
     }
 
