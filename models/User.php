@@ -75,6 +75,26 @@ class User extends \yii\mongodb\ActiveRecord implements IdentityInterface
     }
 
     /**
+     * @inheritdoc
+     * @return array
+     */
+    public function attributeLabels()
+    {
+        return [
+            '_id' => Yii::t('user', 'ID'),
+            'username' => Yii::t('user', 'Username'),
+            'created_at' => Yii::t('user', 'Created At'),
+            'updated_at' => Yii::t('user', 'Updated At'),
+            'confirmed_at' => Yii::t('user', 'Confirmed At'),
+            'blocked_at' => Yii::t('user', 'Blocked At'),
+            'email' => Yii::t('user', 'Email'),
+            'auth_key' => Yii::t('user', 'Authentication Key'),
+            'password_hash' => Yii::t('user', 'Password Hash'),
+            'profile_data' => Yii::t('user', 'Profile Data'),
+        ];
+    }
+
+    /**
      * @return array
      */
     public function behaviors()
