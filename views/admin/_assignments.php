@@ -20,7 +20,7 @@ $this->beginContent('@andrew72ru/user/views/admin/update.php', ['model' => $mode
     'body' => Yii::t('user', 'You can assign multiple roles or permissions to user by using the form below')
 ])?>
 
-<?= Assignments::widget(['userId' => $model->_id])?>
+<?= Assignments::widget(['userId' => (string) $model->_id])?>
 
 <?php $this->endContent() ?>
 
