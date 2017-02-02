@@ -13,7 +13,6 @@
 use andrew72ru\user\models\User;
 use yii\grid\GridView;
 use yii\helpers\Html;
-use yii\helpers\Url;
 use yii\widgets\Pjax;
 
 $this->title = Yii::t('user', 'Manage users');
@@ -65,7 +64,8 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
         [
             'class' => \yii\grid\ActionColumn::className(),
-            'contentOptions' => ['class' => 'text-center'],
+            'contentOptions' => ['class' => 'text-right text-nowrap', 'style' => 'width: 15px'],
+            'buttonOptions' => ['class' => 'btn btn-xs btn-flat', 'data-toggle' => 'tooltip'],
             'template' => '{switch} {resend_password} {update} {delete}',
             'buttons' => [
                 'resend_password' => function($url, User $model)
@@ -74,6 +74,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     {
                         return Html::a(Html::tag('span', '', ['class' => 'glyphicon glyphicon-envelope']), ['resend-password', 'id' => (string) $model->_id], [
                             'title' => Yii::t('user', 'Generate and send new password to user'),
+                            'class' => 'btn btn-xs btn-flat',
                             'data' => [
                                 'method' => 'post',
                                 'confirm' => Yii::t('user', 'Are you sure?'),
@@ -89,9 +90,11 @@ $this->params['breadcrumbs'][] = $this->title;
                     {
                         return Html::a(Html::tag('span', '', ['class' => 'glyphicon glyphicon-user']), ['switch', 'id' => (string) $model->_id], [
                             'title' => Yii::t('user', 'Become this user'),
+                            'class' => 'btn btn-xs btn-flat',
                             'data' => [
                                 'confirm' => Yii::t('user', 'Are you sure you want to switch to this user for the rest of this Session?'),
                                 'method' => 'post',
+                                'toggle' => 'tooltip'
                             ]
                         ]);
                     }
