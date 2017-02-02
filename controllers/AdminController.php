@@ -216,6 +216,24 @@ class AdminController extends Controller
 
     /**
      * @param $id
+     * @return string
+     * @throws NotFoundHttpException
+     */
+    public function actionAssignments($id)
+    {
+        if((Yii::$app->getModule('rbac')->className() != 'andrew72ru\\rbac\\RbacWebModule'))
+            throw new NotFoundHttpException();
+
+        Url::remember('', 'actions-redirect');
+        $model = $this->findModel($id);
+
+        return $this->render('_assignments', [
+            'model' => $model
+        ]);
+    }
+
+    /**
+     * @param $id
      * @return User
      * @throws NotFoundHttpException
      */
