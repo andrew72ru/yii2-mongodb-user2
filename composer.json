@@ -14,13 +14,19 @@
     "yiisoft/yii2": "^2.0",
     "intervention/image": "^2.3",
     "yiisoft/yii2-mongodb": "^2.1",
-    "bower-asset/flow.js": "^2.11"
+    "andrew72ru/yii2-flowjs": "*"
   },
   "autoload": {
     "psr-4": {
       "andrew72ru\\user\\": ""
     }
   },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/andrew72ru/yii2-flowjs"
+    }
+  ],
   "extra": {
     "bootstrap": "andrew72ru\\user\\Bootstrap",
     "branch-alias": {

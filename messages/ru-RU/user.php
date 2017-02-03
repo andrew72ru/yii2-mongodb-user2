@@ -30,6 +30,7 @@ return [
     'Are you sure?' => 'Вы уверены?',
     'Assignments' => 'Права',
     'Authentication Key' => 'Ключ авторизации',
+    'Avatar' => 'Аватар',
     'Become this user' => 'Притвориться этим пользователем',
     'Block' => 'Блокировать',
     'Block status' => 'Блокировка',

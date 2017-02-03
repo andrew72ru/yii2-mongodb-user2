@@ -144,21 +144,50 @@ class UserAvatar extends \yii\mongodb\file\ActiveRecord
             if(!$this->user_id)
                 $this->user_id = \Yii::$app->user->identity->_id;
 
-            $image = $this->manager->make($this->uploadedFile->tempName);
-            if(!($image instanceof \Intervention\Image\Image))
-            {
-                \Yii::error("Unable to create Image from {$this->uploadedFile->tempName}", 'User Avatar');
-                return false;
-            }
-            $image->fit($size, $size);
-            $this->filename = 'avatar.png';
-            $this->thumbnail_size = 'default';
-            $this->newFileContent = $image->encode('png');
-            self::deleteAll(['user_id' => $this->user_id]);
-
-            return $this->save();
+            return $this->uploadToDb($this->uploadedFile->tempName, $size, $this->user_id);
         }
 
         return false;
+    }
+
+    /**
+     * @param string $path
+     * @param int $size
+     * @return bool
+     */
+    public static function setFromFile($path, $size = 300)
+    {
+        return (new self())->uploadToDb($path, $size);
+    }
+
+    /**
+     * @param string $path
+     * @param int $size
+     * @param null|ObjectID $user_id
+     * @return bool
+     */
+    private function uploadToDb($path, $size, $user_id = null)
+    {
+        if($user_id === null)
+            $user_id = \Yii::$app->user->identity->_id;
+
+        if(!($user_id instanceof ObjectID))
+            throw new \BadMethodCallException('user id must be an Object id');
+
+        $image = $this->manager->make($path);
+        if(!($image instanceof \Intervention\Image\Image))
+        {
+            \Yii::error("Unable to create Image from {$path}", 'User Avatar');
+            return false;
+        }
+        $image->fit($size, $size);
+        $this->filename = 'avatar.png';
+        $this->thumbnail_size = 'default';
+        $this->user_id = $user_id;
+
+        $this->newFileContent = $image->encode('png');
+        self::deleteAll(['user_id' => $user_id]);
+
+        return $this->save();
     }
 }

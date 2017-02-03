@@ -8,8 +8,10 @@
  *
  * @var \yii\web\View $this
  * @var \andrew72ru\user\models\Profile $model
+ * @var \andrew72ru\user\models\User $user
  */
 
+use andrew72ru\flowjs\widgets\UploadImageWidget;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -41,6 +43,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?= $form->field($model, 'first_name')->textInput()?>
 
                 <?= $form->field($model, 'last_name')->textInput()?>
+
+                <?= $form->field($user->getAvatarModel(), 'uploadedFile')->widget(UploadImageWidget::className(), [
+                    'preview' => $user->getAvatar(300),
+                    'callbackClass' => $user->getAvatarModel()->className(),
+                    'callbackMethod' => 'setFromFile'
+                ])->label(Yii::t('user', 'Avatar'))?>
 
                 <div class="form-group">
                     <div class="col-sm-offset-3 col-sm-9">
