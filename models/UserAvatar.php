@@ -157,16 +157,17 @@ class UserAvatar extends \yii\mongodb\file\ActiveRecord
      */
     public static function setFromFile($path, $size = 300)
     {
-        return (new self())->uploadToDb($path, $size);
+        return (new self())->uploadToDb($path, $size, null, true);
     }
 
     /**
-     * @param string $path
-     * @param int $size
+     * @param string $path path to source file
+     * @param int $size with and height of result image
      * @param null|ObjectID $user_id
+     * @param bool $remove are the source file will be removed after save
      * @return bool
      */
-    private function uploadToDb($path, $size, $user_id = null)
+    private function uploadToDb($path, $size, $user_id = null, $remove = false)
     {
         if($user_id === null)
             $user_id = \Yii::$app->user->identity->_id;
@@ -187,6 +188,13 @@ class UserAvatar extends \yii\mongodb\file\ActiveRecord
 
         $this->newFileContent = $image->encode('png');
         self::deleteAll(['user_id' => $user_id]);
+
+        if($remove)
+        {
+            try {
+                unlink($path);
+            } catch (\Exception $exception) {}
+        }
 
         return $this->save();
     }
