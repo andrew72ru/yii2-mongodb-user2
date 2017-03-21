@@ -100,7 +100,7 @@ class AdminController extends Controller
             return ActiveForm::validate($model);
         }
 
-        if($model->load(Yii::$app->request->post()) && $model->save())
+        if($model->load(Yii::$app->request->post()) && $model->create())
         {
             Yii::$app->session->addFlash('success', Yii::t('user', 'User has been created'));
             return $this->redirect(['update', 'id' => (string) $model->_id]);

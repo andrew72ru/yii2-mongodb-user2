@@ -159,6 +159,7 @@ class User extends \yii\mongodb\ActiveRecord implements IdentityInterface
             ['email', 'required'],
             ['email', 'email'],
             [['email', 'username'], 'validateUnique'],
+            ['password', 'string', 'skipOnEmpty' => true],
 //            ['profile_data', 'validateProfile', 'skipOnEmpty' => true],
         ];
     }
